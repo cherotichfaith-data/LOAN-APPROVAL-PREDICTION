@@ -5,7 +5,10 @@ import difflib
 
 # Load the model and encoders
 with open("loan_approval_model1.pkl", "rb") as f:
-    model, label_encoders = pickle.load(f)
+    obj = pickle.load(f)
+
+print(type(obj))
+
 
 categorical_features = [
     'person_gender',
