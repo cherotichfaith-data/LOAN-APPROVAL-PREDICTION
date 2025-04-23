@@ -76,7 +76,6 @@ with st.form("loan_form"):
     amount = st.number_input("Loan Amount ($)", 500, 500000, 10000)
     intent = st.selectbox("Loan Purpose", ['PERSONAL', 'EDUCATION', 'MEDICAL', 'VENTURE', 'HOMEIMPROVEMENT', 'DEBTCONSOLIDATION'])
     rate = st.number_input("Interest Rate (%)", 0.0, 100.0, 10.5)
-    percent_income = st.number_input("Loan % of Income", 0.0, 1.0, 0.2)
     cred_hist = st.number_input("Credit History Length (years)", 1, 50, 5)
     score = st.number_input("Credit Score", 300, 850, 700)
     defaults = st.selectbox("Previous Loan Defaults on File", ['No', 'Yes'])
@@ -86,6 +85,9 @@ if submitted:
     if model is None:
         st.error("Model not loaded properly. Please check the model file.")
     else:
+        # Calculate loan percent of income automatically
+        percent_income = min(1.0, amount / income) if income > 0 else 0
+        
         new_data = pd.DataFrame([{
             'person_age': age,
             'person_income': income,
@@ -101,6 +103,9 @@ if submitted:
             'credit_score': score,
             'previous_loan_defaults_on_file': defaults
         }])
+        
+        # Display the calculated loan percent of income
+        st.info(f"Loan as percentage of income: {percent_income:.1%}")
         
         # Clean + match categorical
         for col in categorical_features:
