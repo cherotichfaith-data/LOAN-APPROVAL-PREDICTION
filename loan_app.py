@@ -4,7 +4,7 @@ import pickle
 import difflib
 
 # Load the model and encoders
-with open("loan_prediction_model.pkl", "rb") as f:
+with open("loan_approval_model.pkl", "rb") as f:
     model, label_encoders = pickle.load(f)
 
 categorical_features = [
