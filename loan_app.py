@@ -6,9 +6,17 @@ import difflib
 # Load the model and encoders
 with open("loan_approval_model1.pkl", "rb") as f:
     obj = pickle.load(f)
+    
+# Check if the loaded object is a dictionary with model and encoders
+if isinstance(obj, dict):
+    model = obj.get('model')
+    label_encoders = obj.get('label_encoders', {})
+else:
+    # If it's just the model directly
+    model = obj
+    label_encoders = {}  # Create empty dict if no encoders were saved
 
 print(type(obj))
-
 
 categorical_features = [
     'person_gender',
@@ -63,7 +71,6 @@ with st.form("loan_form"):
     cred_hist = st.number_input("Credit History Length (years)", 1, 50, 5)
     score = st.number_input("Credit Score", 300, 850, 700)
     defaults = st.selectbox("Previous Loan Defaults on File", ['No', 'Yes'])
-
     submitted = st.form_submit_button("Check Loan Status")
 
 if submitted:
@@ -82,7 +89,7 @@ if submitted:
         'credit_score': score,
         'previous_loan_defaults_on_file': defaults
     }])
-
+    
     # Clean + match categorical
     for col in categorical_features:
         new_data[col] = new_data[col].astype(str).str.strip()
@@ -91,12 +98,14 @@ if submitted:
         if col in label_encoders:
             new_data[col] = new_data[col].apply(lambda v: match_known_value(v, label_encoders[col].classes_))
             new_data[col] = label_encoders[col].transform(new_data[col])
-
-    new_data = new_data[model.feature_names_in_]
-
+    
+    # Make sure we only include features the model was trained on
+    if hasattr(model, 'feature_names_in_'):
+        new_data = new_data[model.feature_names_in_]
+    
     # Predict
     prediction = model.predict(new_data)[0]
-
+    
     # Display result
     if prediction == 1:
         st.success("✅ Loan Approved")
