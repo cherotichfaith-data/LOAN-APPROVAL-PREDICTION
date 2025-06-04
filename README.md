@@ -1,7 +1,4 @@
 # LOAN-APPROVAL-PREDICTION
-Great! Here's a **professional and clear `README.md`** for your loan approval prediction project based on the Streamlit app and your notebook:
-
----
 
 # 🏦 Skies Loan Approval Prediction App
 
